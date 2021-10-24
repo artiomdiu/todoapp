@@ -45,3 +45,11 @@ def create_todo():
 @app.route('/')
 def index():
     return render_template('index.html', data=Todo.query.all())
+
+
+if __name__ == '__main__':
+    app.run(
+        degug=True,
+        host='127.0.0.1',
+        port=5432
+    )
