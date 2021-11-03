@@ -33,7 +33,7 @@
   <body>
     <div class="lists-wrapper">
         <h4>Todo Lists</h4>
-        <form id="form_list" method="post" action="/todos/create_list">
+        <form id="form_list" method="post" action="/lists/create">
             <input type="text" id="name" name="name" />
             <input type="submit" value="Create" />
         </form>
@@ -41,7 +41,7 @@
         <ul id="lists">
             {%  for list in lists %}
             <li>
-{#                <input class="check-completed" data-id="{{ list.id }}" type="checkbox" {% if list.completed %} checked {% endif %} />#}
+                <input class="check-list-completed" data-id="{{ list.id }}" type="checkbox" {% if list.completed %} checked {% endif %} />
                 <a href="/lists/{{ list.id }}">
                     {{ list.name }}
                 </a>
@@ -51,9 +51,32 @@
         </ul>
     </div>
     <script>
+        const checkboxes_list = document.querySelectorAll('.check-list-completed');
+        for (let i = 0; i < checkboxes_list.length; i++) {
+            const checkbox_list = checkboxes_list[i];
+            checkbox_list.onchange = function(e) {
+              const newCompleted = e.target.checked;
+              const listId = e.target.dataset['id'];
+              fetch('/lists/' + listId + '/set-completed', {
+                method: 'POST',
+                body: JSON.stringify({
+                  'completed': newCompleted
+                }),
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              })
+              .then(function() {
+                document.getElementById('error').className = 'hidden';
+              })
+              .catch(function() {
+                document.getElementById('error').className = '';
+              })
+            }
+        }
         document.getElementById('form_list').onsubmit = function(e) {
             e.preventDefault();
-            fetch('/todos/create_list', {
+            fetch('/lists/create', {
               method: 'POST',
               body: JSON.stringify({
                 'name': document.getElementById('name').value,
@@ -65,14 +88,14 @@
             .then(response => response.json())
             .then(jsonResponse => {
               const li = document.createElement('li');
-              {#const checkbox = document.createElement('input');#}
-              {#checkbox.className = 'check-completed';#}
-              {#checkbox.type = 'checkbox';#}
-              {#checkbox.setAttribute('data-id', jsonResponse.id);#}
-              {#li.appendChild(checkbox);#}
+              const checkbox_list = document.createElement('input');
+              checkbox_list.className = 'check-list-completed';
+              checkbox_list.type = 'checkbox';
+              checkbox_list.setAttribute('data-id', jsonResponse.id);
+              li.appendChild(checkbox_list);
 
-              const text = document.createTextNode(' ' + jsonResponse.name);
-              li.appendChild(text);
+              const text_list = document.createTextNode(' ' + jsonResponse.name);
+              li.appendChild(text_list);
 
               {#const deleteBtn = document.createElement('button');#}
               {#deleteBtn.className = 'delete-button';#}
@@ -80,7 +103,7 @@
               {#deleteBtn.innerHTML = '&cross;';#}
               {#li.appendChild(deleteBtn);#}
 
-              document.getElementById('todolists').appendChild(li);
+              document.getElementById('lists').appendChild(li);
               document.getElementById('error').className = 'hidden';
             })
             .catch(function() {
