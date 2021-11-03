@@ -35,7 +35,8 @@ def create_todo():
     body = {}
     try:
         description = request.get_json()['description']
-        todo = Todo(description=description)
+        list_id = request.get_json()['list_id']
+        todo = Todo(description=description, completed=False, list_id=list_id)
         db.session.add(todo)
         db.session.commit()
         body['id'] = todo.id
@@ -48,7 +49,7 @@ def create_todo():
     finally:
         db.session.close()
     if error:
-        abort(400)
+        abort(500)
     else:
         return jsonify(body)
 
@@ -71,7 +72,7 @@ def create_list():
     finally:
         db.session.close()
     if error:
-        abort(400)
+        abort(500)
     else:
         return jsonify(body)
 
