@@ -52,9 +52,9 @@
         </ul>
     </div>
     <script>
-        const checkboxes_list = document.querySelectorAll('.check-list-completed');
-        for (let i = 0; i < checkboxes_list.length; i++) {
-            const checkbox_list = checkboxes_list[i];
+        const listCheckboxes = document.querySelectorAll('.check-list-completed');
+        for (let i = 0; i < listCheckboxes.length; i++) {
+            const checkbox_list = listCheckboxes[i];
             checkbox_list.onchange = function(e) {
               const newCompleted = e.target.checked;
               const listId = e.target.dataset['id'];
@@ -67,8 +67,13 @@
                   'Content-Type': 'application/json'
                 }
               })
-              .then(function() {
+              .then(function(jsonResponse) {
                 document.getElementById('error').className = 'hidden';
+                const todoCheckboxes = document.querySelectorAll('.todo-check-completed');
+                for (let i = 0; i < todoCheckboxes.length; i++) {
+                    const checkbox = todoCheckboxes[i];
+                    checkbox.checked = true;
+                }
               })
               .catch(function() {
                 document.getElementById('error').className = '';
@@ -124,7 +129,7 @@
         <ul id="todos">
           {% for todo in todos %}
           <li>
-            <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
+            <input class="todo-check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
             {{ todo.description }}
             <button class="delete-button" data-id="{{ todo.id }}">&cross;</button>
           </li>
@@ -132,9 +137,9 @@
         </ul>
     </div>
     <script>
-      const checkboxes = document.querySelectorAll('.check-completed');
-      for (let i = 0; i < checkboxes.length; i++) {
-        const checkbox = checkboxes[i];
+      const todoCheckboxes = document.querySelectorAll('.todo-check-completed');
+      for (let i = 0; i < todoCheckboxes.length; i++) {
+        const checkbox = todoCheckboxes[i];
         checkbox.onchange = function(e) {
           const newCompleted = e.target.checked;
           const todoId = e.target.dataset['id'];
