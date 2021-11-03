@@ -52,6 +52,29 @@ def create_todo():
         return jsonify(body)
 
 
+@app.route('/todos/create_list', methods=['POST'])
+def create_list():
+    error = False
+    body = {}
+    try:
+        name = request.get_json()['name']
+        todo_list = TodoList(name=name)
+        db.session.add(todo_list)
+        db.session.commit()
+        body['id'] = todo_list.id
+        body['name'] = todo_list.name
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if error:
+        abort(400)
+    else:
+        return jsonify(body)
+
+
 @app.route('/todos/<todo_id>/set-completed', methods=['POST'])
 def set_completed_todo(todo_id):
     try:
